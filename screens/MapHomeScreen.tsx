@@ -3,15 +3,23 @@ import { StyleSheet, TouchableOpacity, Image, Alert } from "react-native";
 import { useSelector, shallowEqual } from "react-redux";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
+import axios from "axios";
 
 import { Text, View } from "../components/Themed";
 import {
   Location as geoLocation,
   LocationState,
+  PredictionType,
   RootStackScreenProps,
 } from "../types";
+import SearchBarWithAutocomplete from "../components/SearchBarWithAutocomplete";
+import { useDebounce } from "../hooks/useDebounce";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { PredictionList } from "../components/PredictionList";
 
 const markerSource = "../assets/pngwing.png";
+const GOOGLE_PACES_API_BASE_URL = "https://maps.googleapis.com/maps/api/place";
+const apiKey = "AIzaSyD_rQ_p-oEGxmSB3wQ9y0BMlhcCYj8fk1E";
 
 export default function MapHomeScreen({
   navigation,
@@ -22,6 +30,10 @@ export default function MapHomeScreen({
     latitudeDelta: 0.09,
     longitudeDelta: 0.04,
   });
+  const [search, setSearch] = useState({ term: "", fetchPredictions: false });
+  const [predictions, setPredictions] = useState<PredictionType[]>([]);
+  const [showPredictions, setShowPredictions] = useState(false);
+
   const [locationServiceEnabled, setLocationServiceEnabled] = useState(false);
   const [displayCurrentAddress, setDisplayCurrentAddress] = useState(
     "Wait, we are fetching you location..."
@@ -91,8 +103,68 @@ export default function MapHomeScreen({
     }
   };
 
+  const onChangeText = async () => {
+    if (search.term.trim() === "") return;
+    if (!search.fetchPredictions) return;
+
+    const apiUrl = `${GOOGLE_PACES_API_BASE_URL}/autocomplete/json?key=${apiKey}&input=${search.term}`;
+    try {
+      const result = await axios.request({
+        method: "post",
+        url: apiUrl,
+      });
+      if (result) {
+        const {
+          data: { predictions },
+        } = result;
+        setPredictions(predictions);
+        setShowPredictions(true);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useDebounce(onChangeText, 1000, [search.term]);
+
+  const onPredictionTapped = async (placeId: string, description: string) => {
+    const apiUrl = `${GOOGLE_PACES_API_BASE_URL}/details/json?key=${apiKey}&place_id=${placeId}`;
+    try {
+      const result = await axios.request({
+        method: "post",
+        url: apiUrl,
+      });
+      if (result) {
+        const {
+          data: {
+            result: {
+              geometry: { location },
+            },
+          },
+        } = result;
+        const { lat, lng } = location;
+        setShowPredictions(false);
+        setSearch({ term: description, fetchPredictions: false });
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.overTop}>
+        <SearchBarWithAutocomplete
+          value={search.term}
+          onChangeText={(text) => {
+            setSearch({ term: text, fetchPredictions: true });
+          }}
+          showPredictions={showPredictions}
+          predictions={predictions}
+          onPredictionTapped={onPredictionTapped}
+        />
+      </View>
+
       <MapView
         style={{ alignSelf: "stretch", height: "100%" }}
         region={mapRegion}
@@ -121,7 +193,12 @@ export default function MapHomeScreen({
       >
         <Text style={styles.linkText}>Go to home screen!</Text>
       </TouchableOpacity> */}
-    </View>
+      <PredictionList
+        predictions={predictions}
+        showPredictions={showPredictions}
+        onPredictionTapped={onPredictionTapped}
+      />
+    </SafeAreaView>
   );
 }
 
@@ -133,9 +210,28 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
+  overTop: {
+    zIndex: 5,
+  },
   marker: {
     height: 50,
     width: 30,
     resizeMode: "contain",
+  },
+  predictionsContainer: {
+    backgroundColor: "#cfcfcf",
+    padding: 10,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    position: "absolute",
+    bottom: 0,
+    height: "70%",
+    width: "100%",
+  },
+  predictionRow: {
+    paddingBottom: 15,
+    marginBottom: 15,
+    borderBottomColor: "black",
+    borderBottomWidth: 1,
   },
 });
