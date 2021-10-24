@@ -1,5 +1,5 @@
-import { StatusBar } from "expo-status-bar";
 import React from "react";
+import { StatusBar } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { Provider } from "react-redux";
@@ -25,9 +25,9 @@ export default function App() {
   } else {
     return (
       <Provider store={store}>
+        <StatusBar barStyle={"dark-content"} />
         <SafeAreaProvider>
           <Navigation colorScheme={colorScheme} />
-          <StatusBar />
         </SafeAreaProvider>
       </Provider>
     );
