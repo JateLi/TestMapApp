@@ -8,10 +8,9 @@ import * as React from "react";
 import { ColorSchemeName } from "react-native";
 
 import ModalScreen from "../screens/ModalScreen";
-import NotFoundScreen from "../screens/NotFoundScreen";
+import MapHomeScreen from "../screens/MapHomeScreen";
 
 import { RootStackParamList } from "../types";
-import LinkingConfiguration from "./LinkingConfiguration";
 
 export default function Navigation({
   colorScheme,
@@ -20,7 +19,6 @@ export default function Navigation({
 }) {
   return (
     <NavigationContainer
-      linking={LinkingConfiguration}
       theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
     >
       <RootNavigator />
@@ -35,7 +33,7 @@ function RootNavigator() {
     <Stack.Navigator>
       <Stack.Screen
         name="NotFound"
-        component={NotFoundScreen}
+        component={MapHomeScreen}
         options={{
           headerShown: false,
         }}

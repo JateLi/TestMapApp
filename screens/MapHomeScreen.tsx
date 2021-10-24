@@ -1,12 +1,20 @@
 import * as React from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
+import { useSelector, shallowEqual } from "react-redux";
+
 import { Text, View } from "../components/Themed";
+import { Location, LocationState, RootStackScreenProps } from "../types";
 
-import { RootStackScreenProps } from "../types";
-
-export default function NotFoundScreen({
+export default function MapHomeScreen({
   navigation,
 }: RootStackScreenProps<"NotFound">) {
+  const locations: readonly Location[] = useSelector(
+    (state: LocationState) => state.locations,
+    shallowEqual
+  );
+
+  console.log(locations);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>This screen doesn't exist.</Text>
