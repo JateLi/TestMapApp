@@ -49,12 +49,17 @@ export default function MapHomeScreen({
     latitudeDelta: 0.09,
     longitudeDelta: 0.04,
   });
-  const [markerLocation, setmarkerLocation] = useState(null);
+  const [markerLocation, setmarkerLocation] = useState({
+    latitude: 0,
+    longitude: 0,
+    latitudeDelta: 0.09,
+    longitudeDelta: 0.04,
+  });
 
   const [search, setSearch] = useState({ term: "", fetchPredictions: false });
   const [predictions, setPredictions] = useState<PredictionType[]>([]);
   const [showPredictions, setShowPredictions] = useState(false);
-  //const [showLocationList, setshowLocationList] = useState(false);
+  const [showMarker, setShowMarker] = useState(false);
 
   const [locationServiceEnabled, setLocationServiceEnabled] = useState(false);
   const [displayCurrentAddress, setDisplayCurrentAddress] = useState(
@@ -135,6 +140,17 @@ export default function MapHomeScreen({
         latitudeDelta: mapRegion.latitudeDelta,
         longitudeDelta: mapRegion.longitudeDelta,
       });
+      if (showFullScreen) {
+        console.log("marker");
+        setmarkerLocation({
+          latitude,
+          longitude,
+          latitudeDelta: mapRegion.latitudeDelta,
+          longitudeDelta: mapRegion.longitudeDelta,
+        });
+        setShowMarker(true);
+      }
+
       getDisplayAddress(response);
     }
   };
@@ -212,11 +228,24 @@ export default function MapHomeScreen({
 
   const onConfirmLocationMarker = (type: "confirm" | "cancel") => {
     // Save location and clean the marker
+    if (type === "confirm") {
+      const newLocationItem = {
+        id: "-1",
+        title: "Current Location",
+        body: "Current Location",
+        latitude: markerLocation.latitude,
+        longitude: markerLocation.longitude,
+      };
+      addingLocationToList(newLocationItem);
+    }
+    setshowFullScreen(false);
+    setShowMarker(false);
   };
 
   const onCalculateDirection = () => {};
 
   const onClickDestinations = () => {
+    // TODO display on result in modal screen
     navigation.navigate("Modal");
   };
 
@@ -240,45 +269,41 @@ export default function MapHomeScreen({
         style={{ alignSelf: "stretch", height: "100%" }}
         region={mapRegion}
       >
-        {markerLocation && (
+        {markerLocation && showMarker && (
           <Marker
             draggable
             coordinate={mapRegion}
             title={displayCurrentAddress}
             onDragEnd={(e) => {
+              const latitude = e.nativeEvent.coordinate.latitude;
+              const longitude = e.nativeEvent.coordinate.longitude;
               setmarkerLocation({
-                latitude: e.nativeEvent.coordinate.latitude,
-                longitude: e.nativeEvent.coordinate.longitude,
+                latitude,
+                longitude,
                 latitudeDelta: markerLocation.latitudeDelta,
                 longitudeDelta: markerLocation.longitudeDelta,
               });
               setmapRegion({
-                latitude: e.nativeEvent.coordinate.latitude,
-                longitude: e.nativeEvent.coordinate.longitude,
+                latitude,
+                longitude,
                 latitudeDelta: markerLocation.latitudeDelta,
                 longitudeDelta: markerLocation.longitudeDelta,
               });
-              setDisplayCurrentAddress("Something else");
+              const displayCoordinates = `GPS: Latitude:${latitude} Longitude:${longitude}`;
+              setDisplayCurrentAddress(displayCoordinates);
             }}
           >
             <Image style={styles.marker} source={require(markerSource)} />
           </Marker>
         )}
       </MapView>
-
-      {/* <TouchableOpacity
-        onPress={() => navigation.navigate("Modal")}
-        style={styles.link}
-      >
-        <Text style={styles.linkText}>Go to home screen!</Text>
-      </TouchableOpacity> */}
       {!showFullScreen && (
         <View style={{ position: "absolute", bottom: "50%", right: 5 }}>
           <Button
             onPress={() => {
-              // TODO convert to full screen mode
-              getCurrentLocation();
               setshowFullScreen(true);
+              setShowMarker(true);
+              getCurrentLocation();
             }}
             title={"Current"}
           />
@@ -293,12 +318,13 @@ export default function MapHomeScreen({
         <LocationsList
           locations={locations}
           removingLocationFromList={removingLocationFromList}
+          onClickDestinations={onClickDestinations}
         />
       )}
       {showFullScreen && (
         <ConfirmButtonGroup
-          onCancelPress={() => {}}
-          onConfirmPress={() => {}}
+          onCancelPress={() => onConfirmLocationMarker("cancel")}
+          onConfirmPress={() => onConfirmLocationMarker("confirm")}
         />
       )}
     </SafeAreaView>

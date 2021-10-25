@@ -1,5 +1,11 @@
 import React, { FunctionComponent } from "react";
-import { StyleSheet, Text, FlatList, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { PredictionType } from "../types";
 
 type SearchBarProps = {
@@ -20,12 +26,24 @@ export const PredictionList: FunctionComponent<SearchBarProps> = ({
       data={predictions}
       renderItem={({ item, index }) => {
         return (
-          <TouchableOpacity
-            style={predictionRow}
-            onPress={() => onPredictionTapped(item.place_id, item.description)}
-          >
+          <View style={predictionRow}>
+            <TouchableOpacity
+              style={styles.circle}
+              onPress={() =>
+                onPredictionTapped(item.place_id, item.description)
+              }
+            >
+              <Text
+                style={{
+                  fontSize: 25,
+                  color: "white",
+                }}
+              >
+                +
+              </Text>
+            </TouchableOpacity>
             <Text numberOfLines={1}>{item.description}</Text>
-          </TouchableOpacity>
+          </View>
         );
       }}
       keyExtractor={(item) => item.place_id}
@@ -37,8 +55,7 @@ export const PredictionList: FunctionComponent<SearchBarProps> = ({
 
 const styles = StyleSheet.create({
   predictionsContainer: {
-    backgroundColor: "#cfcfcf",
-    padding: 10,
+    backgroundColor: "white",
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
     position: "absolute",
@@ -47,9 +64,21 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   predictionRow: {
-    paddingBottom: 15,
-    marginBottom: 15,
     borderBottomColor: "black",
     borderBottomWidth: 1,
+    backgroundColor: "white",
+    height: 50,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: "5%",
+  },
+  circle: {
+    height: 30,
+    width: 30,
+    borderRadius: 15,
+    backgroundColor: "green",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 5,
   },
 });

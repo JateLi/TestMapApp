@@ -14,6 +14,7 @@ type SearchBarProps = {
   locations: Location[];
   showLocations: boolean;
   removingLocationFromList: (location: Location) => void;
+  onClickDestinations: () => void;
 };
 
 const itemHeight = 50;
@@ -23,6 +24,7 @@ export const LocationsList: React.FC<SearchBarProps> = ({
   locations,
   showLocations = true,
   removingLocationFromList,
+  onClickDestinations,
 }) => {
   const { predictionsContainer, predictionRow } = styles;
   const [deleteItem, setDeleteItem] = useState(null);
@@ -44,19 +46,12 @@ export const LocationsList: React.FC<SearchBarProps> = ({
       data={locations}
       ListHeaderComponent={
         <>
-          <View
-            style={{
-              width: "100%",
-              backgroundColor: "white",
-              height: 60,
-              borderColor: "lightgrey",
-              borderBottomWidth: 1,
-            }}
-          >
-            <Text numberOfLines={1}>{"item.title"}</Text>
+          <View style={styles.header}>
+            <Text numberOfLines={1}>{"DIRECTIONS"}</Text>
             <Button
               onPress={() => {
-                // TODO convert to full screen mode
+                // TODO Solve Saleman question
+                onClickDestinations();
               }}
               title={"DIRECTIONS"}
             />
@@ -91,5 +86,15 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     backgroundColor: "white",
     height: 50,
+  },
+  header: {
+    width: "100%",
+    backgroundColor: "white",
+    height: 60,
+    borderColor: "lightgrey",
+    borderBottomWidth: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 });
