@@ -1,11 +1,21 @@
 import React, { FunctionComponent } from "react";
-import { StyleSheet, Text, FlatList, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  View,
+  Button,
+} from "react-native";
 import { Location } from "../types";
 
 type SearchBarProps = {
   locations: Location[];
   showLocations: boolean;
 };
+
+const itemHeight = 50;
+const maxListHeight = 300;
 
 export const LocationsList: FunctionComponent<SearchBarProps> = ({
   locations,
@@ -16,9 +26,34 @@ export const LocationsList: FunctionComponent<SearchBarProps> = ({
   return (
     <FlatList
       data={locations}
+      ListHeaderComponent={
+        <>
+          <View
+            style={{
+              width: "100%",
+              backgroundColor: "white",
+              height: 60,
+              borderColor: "lightgrey",
+              borderBottomWidth: 1,
+            }}
+          >
+            <Text numberOfLines={1}>{"item.title"}</Text>
+            <Button
+              onPress={() => {
+                // TODO convert to full screen mode
+              }}
+              title={"++++"}
+            />
+          </View>
+        </>
+      }
       renderItem={({ item, index }) => {
         return (
-          <TouchableOpacity style={predictionRow} onPress={() => {}}>
+          <TouchableOpacity
+            activeOpacity={1}
+            style={predictionRow}
+            onPress={() => {}}
+          >
             <Text numberOfLines={1}>{item.title}</Text>
           </TouchableOpacity>
         );
@@ -30,19 +65,17 @@ export const LocationsList: FunctionComponent<SearchBarProps> = ({
 
 const styles = StyleSheet.create({
   predictionsContainer: {
-    backgroundColor: "#cfcfcf",
-    padding: 10,
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
     position: "absolute",
     bottom: 0,
-    height: "40%",
+    height: "50%",
     width: "100%",
+    backgroundColor: "white",
   },
   predictionRow: {
     paddingBottom: 15,
-    marginBottom: 15,
     borderBottomColor: "black",
     borderBottomWidth: 1,
+    backgroundColor: "white",
+    height: 50,
   },
 });

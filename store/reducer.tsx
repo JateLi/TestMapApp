@@ -4,36 +4,7 @@ import { Location, LocationAction, LocationState } from "../types";
 
 // TODO Empty Mock Data
 const initialState: LocationState = {
-  locations: [
-    {
-      id: "11111",
-      title: "John Smith Road",
-      body: "libero tempore, cum soluta nobis est eligendi",
-      latitude: 0,
-      longitude: 0,
-    },
-    {
-      id: "22222",
-      title: "Jack Doe Road",
-      body: "pedita distinctio quas molestias excepturi sint",
-      latitude: 0,
-      longitude: 0,
-    },
-    {
-      id: "123321",
-      title: "Walter White Road",
-      body: "Harum quidem rerum folestias excepturi sint",
-      latitude: 0,
-      longitude: 0,
-    },
-    {
-      id: "121",
-      title: "Jesse Pinkman Road",
-      body: "Harum quidem rerum f sint",
-      latitude: 0,
-      longitude: 0,
-    },
-  ],
+  locations: [],
 };
 
 const reducer = (

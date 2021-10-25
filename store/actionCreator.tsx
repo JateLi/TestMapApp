@@ -3,7 +3,7 @@ import * as actionTypes from "./actionTypes";
 
 export function addLocation(contact: Location) {
   const action: LocationAction = {
-    type: actionTypes.ADD_CONTACT,
+    type: actionTypes.ADD_LOCATION,
     location: contact,
   };
 
@@ -12,7 +12,7 @@ export function addLocation(contact: Location) {
 
 export function removeLocation(contact: Location) {
   const action: LocationAction = {
-    type: actionTypes.REMOVE_CONTACT,
+    type: actionTypes.REMOVE_LOCATION,
     location: contact,
   };
   return simulateHttpRequest(action);
@@ -20,7 +20,7 @@ export function removeLocation(contact: Location) {
 
 export function editLocation(contact: Location) {
   const action: LocationAction = {
-    type: actionTypes.EDIT_CONTACT,
+    type: actionTypes.EDIT_LOCATION,
     location: contact,
   };
   return simulateHttpRequest(action);

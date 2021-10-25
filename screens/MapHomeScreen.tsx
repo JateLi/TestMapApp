@@ -27,6 +27,7 @@ import { GOOGLE_API_KEY as apiKey } from "@env";
 import { LocationsList } from "../components/LocationsList";
 import { Dispatch } from "redux";
 import { addLocation } from "../store/actionCreator";
+import { ConfirmButtonGroup } from "../components/ConfirmButtonGroup";
 
 const markerSource = "../assets/pngwing.png";
 const GOOGLE_PACES_API_BASE_URL = "https://maps.googleapis.com/maps/api/place";
@@ -42,6 +43,13 @@ export default function MapHomeScreen({
     latitudeDelta: 0.09,
     longitudeDelta: 0.04,
   });
+  const [markerLocation, setmarkerLocation] = useState({
+    latitude: 0,
+    longitude: 0,
+    latitudeDelta: 0.09,
+    longitudeDelta: 0.04,
+  });
+
   const [search, setSearch] = useState({ term: "", fetchPredictions: false });
   const [predictions, setPredictions] = useState<PredictionType[]>([]);
   const [showPredictions, setShowPredictions] = useState(false);
@@ -56,8 +64,6 @@ export default function MapHomeScreen({
     (state: LocationState) => state.locations,
     shallowEqual
   );
-
-  console.log(apiKey);
   // console.log(locations);
 
   const dispatch: Dispatch<any> = useDispatch();
@@ -169,10 +175,9 @@ export default function MapHomeScreen({
         } = result;
         const { lat, lng } = location;
         // setSearch({ term: description, fetchPredictions: false });
-        // TODO add new location in here
-        console.log(placeId);
+        // Adding new location in here
         const newLocationItem = {
-          id: 123,
+          id: placeId,
           title: description,
           body: description,
           latitude: lat,
@@ -204,22 +209,24 @@ export default function MapHomeScreen({
         style={{ alignSelf: "stretch", height: "100%" }}
         region={mapRegion}
       >
-        <Marker
-          draggable
-          coordinate={mapRegion}
-          title={displayCurrentAddress}
-          onDragEnd={(e) => {
-            setmapRegion({
-              latitude: e.nativeEvent.coordinate.latitude,
-              longitude: e.nativeEvent.coordinate.longitude,
-              latitudeDelta: mapRegion.latitudeDelta,
-              longitudeDelta: mapRegion.longitudeDelta,
-            });
-            setDisplayCurrentAddress("Something else");
-          }}
-        >
-          <Image style={styles.marker} source={require(markerSource)} />
-        </Marker>
+        {markerLocation && (
+          <Marker
+            draggable
+            coordinate={mapRegion}
+            title={displayCurrentAddress}
+            onDragEnd={(e) => {
+              setmapRegion({
+                latitude: e.nativeEvent.coordinate.latitude,
+                longitude: e.nativeEvent.coordinate.longitude,
+                latitudeDelta: markerLocation.latitudeDelta,
+                longitudeDelta: markerLocation.longitudeDelta,
+              });
+              setDisplayCurrentAddress("Something else");
+            }}
+          >
+            <Image style={styles.marker} source={require(markerSource)} />
+          </Marker>
+        )}
       </MapView>
 
       {/* <TouchableOpacity
@@ -228,21 +235,27 @@ export default function MapHomeScreen({
       >
         <Text style={styles.linkText}>Go to home screen!</Text>
       </TouchableOpacity> */}
-      <View style={{ position: "absolute", bottom: 100 }}>
-        <Button
-          onPress={() => {
-            // TODO convert to full screen mode
-            getCurrentLocation();
-          }}
-          title={"++++"}
-        />
-      </View>
+      {!showFullScreen && (
+        <View style={{ position: "absolute", bottom: "50%", right: 5 }}>
+          <Button
+            onPress={() => {
+              // TODO convert to full screen mode
+              getCurrentLocation();
+              setshowFullScreen(true);
+            }}
+            title={"++++"}
+          />
+        </View>
+      )}
       <PredictionList
         predictions={predictions}
-        showPredictions={showPredictions}
+        showPredictions={showPredictions && !showFullScreen}
         onPredictionTapped={onPredictionTapped}
       />
-      {locations && !showPredictions && <LocationsList locations={locations} />}
+      {locations && !showPredictions && !showFullScreen && (
+        <LocationsList locations={locations} />
+      )}
+      <ConfirmButtonGroup />
     </SafeAreaView>
   );
 }
