@@ -22,8 +22,8 @@ const SearchBarWithAutocomplete: FunctionComponent<SearchBarProps> = (
     <View style={container}>
       <TextInput
         style={inputStyle}
-        placeholder="Search by address"
-        placeholderTextColor="gray"
+        placeholder="Search here"
+        placeholderTextColor="black"
         value={value}
         onChangeText={onChangeText}
         returnKeyType="search"
@@ -36,16 +36,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
+    alignItems: "center",
   },
   inputStyle: {
     position: "absolute",
     top: 0,
     paddingVertical: 16,
     paddingHorizontal: 16,
-    backgroundColor: "#cfcfcf",
+    marginTop: 10,
+    backgroundColor: "white",
+    opacity: 0.8,
     color: "black",
     fontSize: 16,
-    width: "100%",
+    width: "96%",
+    textAlign: "center",
   },
 });
 

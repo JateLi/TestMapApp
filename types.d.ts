@@ -34,7 +34,7 @@ export type RootTabScreenProps<
 >;
 
 export interface Location {
-  id: number;
+  id: string;
   title: string;
   body: string;
   latitude: number;

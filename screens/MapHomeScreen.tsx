@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, TouchableOpacity, Image, Alert } from "react-native";
-import { useSelector, shallowEqual } from "react-redux";
+import {
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Alert,
+  Button,
+} from "react-native";
+import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import axios from "axios";
@@ -17,13 +23,19 @@ import { useDebounce } from "../hooks/useDebounce";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PredictionList } from "../components/PredictionList";
 
+import { GOOGLE_API_KEY as apiKey } from "@env";
+import { LocationsList } from "../components/LocationsList";
+import { Dispatch } from "redux";
+import { addLocation } from "../store/actionCreator";
+
 const markerSource = "../assets/pngwing.png";
 const GOOGLE_PACES_API_BASE_URL = "https://maps.googleapis.com/maps/api/place";
-const apiKey = "AIzaSyD_rQ_p-oEGxmSB3wQ9y0BMlhcCYj8fk1E";
 
 export default function MapHomeScreen({
   navigation,
 }: RootStackScreenProps<"NotFound">) {
+  const [showFullScreen, setshowFullScreen] = useState(false);
+
   const [mapRegion, setmapRegion] = useState({
     latitude: 0,
     longitude: 0,
@@ -33,6 +45,7 @@ export default function MapHomeScreen({
   const [search, setSearch] = useState({ term: "", fetchPredictions: false });
   const [predictions, setPredictions] = useState<PredictionType[]>([]);
   const [showPredictions, setShowPredictions] = useState(false);
+  //const [showLocationList, setshowLocationList] = useState(false);
 
   const [locationServiceEnabled, setLocationServiceEnabled] = useState(false);
   const [displayCurrentAddress, setDisplayCurrentAddress] = useState(
@@ -44,7 +57,15 @@ export default function MapHomeScreen({
     shallowEqual
   );
 
-  console.log(locations);
+  console.log(apiKey);
+  // console.log(locations);
+
+  const dispatch: Dispatch<any> = useDispatch();
+
+  const addingLocationToList = React.useCallback(
+    (location: geoLocation) => dispatch(addLocation(location)),
+    [dispatch]
+  );
 
   useEffect(() => {
     checkIfLocationEnabled();
@@ -104,7 +125,11 @@ export default function MapHomeScreen({
   };
 
   const onChangeText = async () => {
-    if (search.term.trim() === "") return;
+    if (search.term.trim() === "") {
+      setShowPredictions(false);
+      setSearch({ term: "", fetchPredictions: false });
+      return;
+    }
     if (!search.fetchPredictions) return;
 
     const apiUrl = `${GOOGLE_PACES_API_BASE_URL}/autocomplete/json?key=${apiKey}&input=${search.term}`;
@@ -143,8 +168,18 @@ export default function MapHomeScreen({
           },
         } = result;
         const { lat, lng } = location;
+        // setSearch({ term: description, fetchPredictions: false });
+        // TODO add new location in here
+        console.log(placeId);
+        const newLocationItem = {
+          id: 123,
+          title: description,
+          body: description,
+          latitude: lat,
+          longitude: lng,
+        };
+        addingLocationToList(newLocationItem);
         setShowPredictions(false);
-        setSearch({ term: description, fetchPredictions: false });
       }
     } catch (e) {
       console.log(e);
@@ -193,11 +228,21 @@ export default function MapHomeScreen({
       >
         <Text style={styles.linkText}>Go to home screen!</Text>
       </TouchableOpacity> */}
+      <View style={{ position: "absolute", bottom: 100 }}>
+        <Button
+          onPress={() => {
+            // TODO convert to full screen mode
+            getCurrentLocation();
+          }}
+          title={"++++"}
+        />
+      </View>
       <PredictionList
         predictions={predictions}
         showPredictions={showPredictions}
         onPredictionTapped={onPredictionTapped}
       />
+      {locations && !showPredictions && <LocationsList locations={locations} />}
     </SafeAreaView>
   );
 }
