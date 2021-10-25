@@ -9,13 +9,19 @@ import {
 } from "react-native";
 import { Location } from "../types";
 
-type ConfirmButtonGroupProps = {};
+type ConfirmButtonGroupProps = {
+  onCancelPress: () => void;
+  onConfirmPress: () => void;
+};
 
-export const ConfirmButtonGroup: FunctionComponent<ConfirmButtonGroupProps> = ({}) => {
+export const ConfirmButtonGroup: FunctionComponent<ConfirmButtonGroupProps> = ({
+  onCancelPress,
+  onConfirmPress,
+}) => {
   return (
     <View style={styles.container}>
-      <Button onPress={() => {}} title={"++++"} />
-      <Button onPress={() => {}} title={"----"} />
+      <Button onPress={onCancelPress} title={"Cancel"} />
+      <Button onPress={onConfirmPress} title={"Confirm"} />
     </View>
   );
 };

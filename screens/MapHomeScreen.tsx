@@ -5,13 +5,14 @@ import {
   Image,
   Alert,
   Button,
+  View,
 } from "react-native";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import axios from "axios";
+import * as Notifications from "expo-notifications";
 
-import { Text, View } from "../components/Themed";
 import {
   Location as geoLocation,
   LocationState,
@@ -26,8 +27,13 @@ import { PredictionList } from "../components/PredictionList";
 import { GOOGLE_API_KEY as apiKey } from "@env";
 import { LocationsList } from "../components/LocationsList";
 import { Dispatch } from "redux";
-import { addLocation } from "../store/actionCreator";
+import { addLocation, removeLocation } from "../store/actionCreator";
 import { ConfirmButtonGroup } from "../components/ConfirmButtonGroup";
+import {
+  askNotification,
+  handleNotification,
+  onSubmitNotification,
+} from "../hooks/useTimerNotification";
 
 const markerSource = "../assets/pngwing.png";
 const GOOGLE_PACES_API_BASE_URL = "https://maps.googleapis.com/maps/api/place";
@@ -43,12 +49,7 @@ export default function MapHomeScreen({
     latitudeDelta: 0.09,
     longitudeDelta: 0.04,
   });
-  const [markerLocation, setmarkerLocation] = useState({
-    latitude: 0,
-    longitude: 0,
-    latitudeDelta: 0.09,
-    longitudeDelta: 0.04,
-  });
+  const [markerLocation, setmarkerLocation] = useState(null);
 
   const [search, setSearch] = useState({ term: "", fetchPredictions: false });
   const [predictions, setPredictions] = useState<PredictionType[]>([]);
@@ -64,7 +65,6 @@ export default function MapHomeScreen({
     (state: LocationState) => state.locations,
     shallowEqual
   );
-  // console.log(locations);
 
   const dispatch: Dispatch<any> = useDispatch();
 
@@ -73,8 +73,24 @@ export default function MapHomeScreen({
     [dispatch]
   );
 
+  const removingLocationFromList = React.useCallback(
+    (location: geoLocation) => dispatch(removeLocation(location)),
+    [dispatch]
+  );
+
   useEffect(() => {
     checkIfLocationEnabled();
+  }, []);
+
+  useEffect(() => {
+    askNotification();
+    // If we want to do something with the notification when the app
+    // is active, we need to listen to notification events and
+    // handle them in a callback
+    const listener = Notifications.addNotificationReceivedListener(
+      handleNotification
+    );
+    return () => listener.remove();
   }, []);
 
   const checkIfLocationEnabled = async () => {
@@ -174,7 +190,7 @@ export default function MapHomeScreen({
           },
         } = result;
         const { lat, lng } = location;
-        // setSearch({ term: description, fetchPredictions: false });
+
         // Adding new location in here
         const newLocationItem = {
           id: placeId,
@@ -184,26 +200,41 @@ export default function MapHomeScreen({
           longitude: lng,
         };
         addingLocationToList(newLocationItem);
+        // Add notification
+        onSubmitNotification(60 * 5, description, description);
         setShowPredictions(false);
+        setSearch({ term: "", fetchPredictions: false });
       }
     } catch (e) {
       console.log(e);
     }
   };
 
+  const onConfirmLocationMarker = (type: "confirm" | "cancel") => {
+    // Save location and clean the marker
+  };
+
+  const onCalculateDirection = () => {};
+
+  const onClickDestinations = () => {
+    navigation.navigate("Modal");
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.overTop}>
-        <SearchBarWithAutocomplete
-          value={search.term}
-          onChangeText={(text) => {
-            setSearch({ term: text, fetchPredictions: true });
-          }}
-          showPredictions={showPredictions}
-          predictions={predictions}
-          onPredictionTapped={onPredictionTapped}
-        />
-      </View>
+      {!showFullScreen && (
+        <View style={styles.overTop}>
+          <SearchBarWithAutocomplete
+            value={search.term}
+            onChangeText={(text) => {
+              setSearch({ term: text, fetchPredictions: true });
+            }}
+            showPredictions={showPredictions}
+            predictions={predictions}
+            onPredictionTapped={onPredictionTapped}
+          />
+        </View>
+      )}
 
       <MapView
         style={{ alignSelf: "stretch", height: "100%" }}
@@ -215,6 +246,12 @@ export default function MapHomeScreen({
             coordinate={mapRegion}
             title={displayCurrentAddress}
             onDragEnd={(e) => {
+              setmarkerLocation({
+                latitude: e.nativeEvent.coordinate.latitude,
+                longitude: e.nativeEvent.coordinate.longitude,
+                latitudeDelta: markerLocation.latitudeDelta,
+                longitudeDelta: markerLocation.longitudeDelta,
+              });
               setmapRegion({
                 latitude: e.nativeEvent.coordinate.latitude,
                 longitude: e.nativeEvent.coordinate.longitude,
@@ -243,7 +280,7 @@ export default function MapHomeScreen({
               getCurrentLocation();
               setshowFullScreen(true);
             }}
-            title={"++++"}
+            title={"Current"}
           />
         </View>
       )}
@@ -253,9 +290,17 @@ export default function MapHomeScreen({
         onPredictionTapped={onPredictionTapped}
       />
       {locations && !showPredictions && !showFullScreen && (
-        <LocationsList locations={locations} />
+        <LocationsList
+          locations={locations}
+          removingLocationFromList={removingLocationFromList}
+        />
       )}
-      <ConfirmButtonGroup />
+      {showFullScreen && (
+        <ConfirmButtonGroup
+          onCancelPress={() => {}}
+          onConfirmPress={() => {}}
+        />
+      )}
     </SafeAreaView>
   );
 }

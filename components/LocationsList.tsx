@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,20 +8,36 @@ import {
   Button,
 } from "react-native";
 import { Location } from "../types";
+import Swipeout from "react-native-swipeout";
 
 type SearchBarProps = {
   locations: Location[];
   showLocations: boolean;
+  removingLocationFromList: (location: Location) => void;
 };
 
 const itemHeight = 50;
 const maxListHeight = 300;
 
-export const LocationsList: FunctionComponent<SearchBarProps> = ({
+export const LocationsList: React.FC<SearchBarProps> = ({
   locations,
   showLocations = true,
+  removingLocationFromList,
 }) => {
   const { predictionsContainer, predictionRow } = styles;
+  const [deleteItem, setDeleteItem] = useState(null);
+
+  const swipeoutBtns = [
+    {
+      text: " - Delete",
+      onPress: () => {
+        if (!deleteItem) return;
+        removingLocationFromList(deleteItem);
+      },
+      backgroundColor: "red",
+    },
+  ];
+
   if (!showLocations) return null;
   return (
     <FlatList
@@ -42,20 +58,18 @@ export const LocationsList: FunctionComponent<SearchBarProps> = ({
               onPress={() => {
                 // TODO convert to full screen mode
               }}
-              title={"++++"}
+              title={"DIRECTIONS"}
             />
           </View>
         </>
       }
       renderItem={({ item, index }) => {
         return (
-          <TouchableOpacity
-            activeOpacity={1}
-            style={predictionRow}
-            onPress={() => {}}
-          >
-            <Text numberOfLines={1}>{item.title}</Text>
-          </TouchableOpacity>
+          <Swipeout left={swipeoutBtns} onOpen={() => setDeleteItem(item)}>
+            <View style={predictionRow}>
+              <Text numberOfLines={1}>{`(${index}) ${item.title}`}</Text>
+            </View>
+          </Swipeout>
         );
       }}
       style={predictionsContainer}
