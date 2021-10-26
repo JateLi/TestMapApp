@@ -25,7 +25,6 @@ export default function App() {
   } else {
     return (
       <Provider store={store}>
-        <StatusBar barStyle={"dark-content"} />
         <SafeAreaProvider>
           <Navigation colorScheme={colorScheme} />
         </SafeAreaProvider>

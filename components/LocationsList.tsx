@@ -40,10 +40,26 @@ export const LocationsList: React.FC<SearchBarProps> = ({
     },
   ];
 
+  const renderEmptyContainer = () => {
+    return (
+      <View
+        style={{
+          width: "100%",
+          alignItems: "center",
+          justifyContent: "center",
+          marginTop: "20%",
+        }}
+      >
+        <Text>The location list is empty</Text>
+      </View>
+    );
+  };
+
   if (!showLocations) return null;
   return (
     <FlatList
       data={locations}
+      ListEmptyComponent={renderEmptyContainer()}
       ListHeaderComponent={
         <>
           <View style={styles.header}>

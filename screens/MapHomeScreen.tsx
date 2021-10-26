@@ -6,12 +6,15 @@ import {
   Alert,
   Button,
   View,
+  StatusBar,
+  Platform,
 } from "react-native";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import axios from "axios";
 import * as Notifications from "expo-notifications";
+import { MaterialIcons } from "@expo/vector-icons";
 
 import {
   Location as geoLocation,
@@ -24,7 +27,7 @@ import { useDebounce } from "../hooks/useDebounce";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PredictionList } from "../components/PredictionList";
 
-import { GOOGLE_API_KEY as apiKey } from "@env";
+// import { GOOGLE_API_KEY as apiKey } from "@env";
 import { LocationsList } from "../components/LocationsList";
 import { Dispatch } from "redux";
 import { addLocation, removeLocation } from "../store/actionCreator";
@@ -37,6 +40,9 @@ import {
 
 const markerSource = "../assets/pngwing.png";
 const GOOGLE_PACES_API_BASE_URL = "https://maps.googleapis.com/maps/api/place";
+const apiKey = "AIzaSyD_rQ_p-oEGxmSB3wQ9y0BMlhcCYj8fk1E";
+
+const STATUSBAR_HEIGHT = Platform.OS === "ios" ? 50 : 0;
 
 export default function MapHomeScreen({
   navigation,
@@ -242,10 +248,8 @@ export default function MapHomeScreen({
     setShowMarker(false);
   };
 
-  const onCalculateDirection = () => {};
-
   const onClickDestinations = () => {
-    // TODO display on result in modal screen
+    // display on result in modal screen
     navigation.navigate("Modal");
   };
 
@@ -297,23 +301,7 @@ export default function MapHomeScreen({
           </Marker>
         )}
       </MapView>
-      {!showFullScreen && (
-        <View style={{ position: "absolute", bottom: "50%", right: 5 }}>
-          <Button
-            onPress={() => {
-              setshowFullScreen(true);
-              setShowMarker(true);
-              getCurrentLocation();
-            }}
-            title={"Current"}
-          />
-        </View>
-      )}
-      <PredictionList
-        predictions={predictions}
-        showPredictions={showPredictions && !showFullScreen}
-        onPredictionTapped={onPredictionTapped}
-      />
+
       {locations && !showPredictions && !showFullScreen && (
         <LocationsList
           locations={locations}
@@ -321,6 +309,25 @@ export default function MapHomeScreen({
           onClickDestinations={onClickDestinations}
         />
       )}
+
+      {!showFullScreen && (
+        <View style={{ position: "absolute", bottom: "52%", right: 20 }}>
+          <TouchableOpacity
+            onPress={() => {
+              setshowFullScreen(true);
+              setShowMarker(true);
+              getCurrentLocation();
+            }}
+          >
+            <MaterialIcons name="my-location" size={35} color="black" />
+          </TouchableOpacity>
+        </View>
+      )}
+      <PredictionList
+        predictions={predictions}
+        showPredictions={showPredictions && !showFullScreen}
+        onPredictionTapped={onPredictionTapped}
+      />
       {showFullScreen && (
         <ConfirmButtonGroup
           onCancelPress={() => onConfirmLocationMarker("cancel")}
@@ -341,6 +348,10 @@ const styles = StyleSheet.create({
   },
   overTop: {
     zIndex: 5,
+    position: "absolute",
+    width: "100%",
+    height: 100,
+    marginTop: STATUSBAR_HEIGHT,
   },
   marker: {
     height: 50,

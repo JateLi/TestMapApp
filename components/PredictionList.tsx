@@ -7,6 +7,7 @@ import {
   View,
 } from "react-native";
 import { PredictionType } from "../types";
+import { FontAwesome } from "@expo/vector-icons";
 
 type SearchBarProps = {
   predictions: PredictionType[];
@@ -33,14 +34,7 @@ export const PredictionList: FunctionComponent<SearchBarProps> = ({
                 onPredictionTapped(item.place_id, item.description)
               }
             >
-              <Text
-                style={{
-                  fontSize: 25,
-                  color: "white",
-                }}
-              >
-                +
-              </Text>
+              <FontAwesome name="plus-circle" size={25} color="green" />
             </TouchableOpacity>
             <Text numberOfLines={1}>{item.description}</Text>
           </View>
