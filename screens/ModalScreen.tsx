@@ -1,3 +1,4 @@
+import { cloneDeep } from "lodash";
 import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
@@ -5,7 +6,6 @@ import {
   FlatList,
   TouchableOpacity,
   View,
-  Button,
 } from "react-native";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { Location as geoLocation, LocationState } from "../types";
@@ -18,36 +18,60 @@ export default function ModalScreen() {
     shallowEqual
   );
 
+  const sortingList = cloneDeep(locations).map((location) => {
+    const latitude = location.latitude;
+    const longitude = location.longitude;
+    return new salesman.Point(longitude, latitude);
+  });
+  console.log(sortingList);
   const { predictionsContainer, predictionRow } = styles;
+  //Mock
   const tests = [
-    [1, 1],
+    [1, 10],
+    [50, 11],
     [0, 1],
-    [0, 1],
-    [0, 2],
+    [1, 2],
     [1, 9],
   ];
 
+  const pathSolution = salesman.solve(sortingList);
+  const newOrderedLocations = pathSolution.map((i) => locations[i]);
+
+  // console.log(pathSolution);
+  // console.log(newOrderedLocations);
   useEffect(() => {
     var points = tests.map(([x, y]) => new salesman.Point(x, y));
     var solution = salesman.solve(points);
     var ordered_points = solution.map((i) => points[i]);
-    console.log(solution);
-    console.log(ordered_points);
+    // console.log(solution);
+    // console.log(ordered_points);
   }, []);
+
+  const renderEmptyContainer = () => {
+    return (
+      <View
+        style={{
+          width: "100%",
+          alignItems: "center",
+          justifyContent: "center",
+          marginTop: "20%",
+        }}
+      >
+        <Text>The location list is empty</Text>
+      </View>
+    );
+  };
 
   return (
     <FlatList
-      data={[]}
-      ListHeaderComponent={
-        <>
-          <View style={styles.header}>
-            <Text numberOfLines={1}>{"DIRECTIONS"}</Text>
-            <Button onPress={() => {}} title={"DIRECTIONS"} />
-          </View>
-        </>
-      }
+      data={newOrderedLocations}
+      ListEmptyComponent={renderEmptyContainer()}
       renderItem={({ item, index }) => {
-        return <View style={predictionRow}></View>;
+        return (
+          <View style={predictionRow}>
+            <Text numberOfLines={1}>{`${item.title}`}</Text>
+          </View>
+        );
       }}
       style={predictionsContainer}
     />
@@ -58,7 +82,7 @@ const styles = StyleSheet.create({
   predictionsContainer: {
     position: "absolute",
     bottom: 0,
-    height: "50%",
+    height: "100%",
     width: "100%",
     backgroundColor: "white",
   },

@@ -8,6 +8,7 @@ import {
   View,
   StatusBar,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import MapView, { Marker } from "react-native-maps";
@@ -27,7 +28,7 @@ import { useDebounce } from "../hooks/useDebounce";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PredictionList } from "../components/PredictionList";
 
-// import { GOOGLE_API_KEY as apiKey } from "@env";
+import { GOOGLE_API_KEY as apiKey } from "@env";
 import { LocationsList } from "../components/LocationsList";
 import { Dispatch } from "redux";
 import { addLocation, removeLocation } from "../store/actionCreator";
@@ -40,7 +41,7 @@ import {
 
 const markerSource = "../assets/pngwing.png";
 const GOOGLE_PACES_API_BASE_URL = "https://maps.googleapis.com/maps/api/place";
-const apiKey = "AIzaSyD_rQ_p-oEGxmSB3wQ9y0BMlhcCYj8fk1E";
+//const apiKey = "AIzaSyD_rQ_p-oEGxmSB3wQ9y0BMlhcCYj8fk1E";
 
 const STATUSBAR_HEIGHT = Platform.OS === "ios" ? 50 : 0;
 
@@ -48,6 +49,7 @@ export default function MapHomeScreen({
   navigation,
 }: RootStackScreenProps<"NotFound">) {
   const [showFullScreen, setshowFullScreen] = useState(false);
+  const [mapLoading, setMapLoading] = useState(true);
 
   const [mapRegion, setmapRegion] = useState({
     latitude: 0,
@@ -146,8 +148,8 @@ export default function MapHomeScreen({
         latitudeDelta: mapRegion.latitudeDelta,
         longitudeDelta: mapRegion.longitudeDelta,
       });
+      setMapLoading(false);
       if (showFullScreen) {
-        console.log("marker");
         setmarkerLocation({
           latitude,
           longitude,
@@ -242,6 +244,7 @@ export default function MapHomeScreen({
         latitude: markerLocation.latitude,
         longitude: markerLocation.longitude,
       };
+      console.log("adding", newLocationItem);
       addingLocationToList(newLocationItem);
     }
     setshowFullScreen(false);
@@ -251,6 +254,14 @@ export default function MapHomeScreen({
   const onClickDestinations = () => {
     // display on result in modal screen
     navigation.navigate("Modal");
+  };
+
+  const activityIndicator = () => {
+    return (
+      <View style={styles.activityHeight}>
+        <ActivityIndicator size="large" color={"black"} />
+      </View>
+    );
   };
 
   return (
@@ -269,38 +280,42 @@ export default function MapHomeScreen({
         </View>
       )}
 
-      <MapView
-        style={{ alignSelf: "stretch", height: "100%" }}
-        region={mapRegion}
-      >
-        {markerLocation && showMarker && (
-          <Marker
-            draggable
-            coordinate={mapRegion}
-            title={displayCurrentAddress}
-            onDragEnd={(e) => {
-              const latitude = e.nativeEvent.coordinate.latitude;
-              const longitude = e.nativeEvent.coordinate.longitude;
-              setmarkerLocation({
-                latitude,
-                longitude,
-                latitudeDelta: markerLocation.latitudeDelta,
-                longitudeDelta: markerLocation.longitudeDelta,
-              });
-              setmapRegion({
-                latitude,
-                longitude,
-                latitudeDelta: markerLocation.latitudeDelta,
-                longitudeDelta: markerLocation.longitudeDelta,
-              });
-              const displayCoordinates = `GPS: Latitude:${latitude} Longitude:${longitude}`;
-              setDisplayCurrentAddress(displayCoordinates);
-            }}
-          >
-            <Image style={styles.marker} source={require(markerSource)} />
-          </Marker>
-        )}
-      </MapView>
+      {mapLoading ? (
+        activityIndicator()
+      ) : (
+        <MapView
+          style={{ alignSelf: "stretch", height: "100%" }}
+          region={mapRegion}
+        >
+          {markerLocation && showMarker && (
+            <Marker
+              draggable
+              coordinate={mapRegion}
+              title={displayCurrentAddress}
+              onDragEnd={(e) => {
+                const latitude = e.nativeEvent.coordinate.latitude;
+                const longitude = e.nativeEvent.coordinate.longitude;
+                setmarkerLocation({
+                  latitude,
+                  longitude,
+                  latitudeDelta: markerLocation.latitudeDelta,
+                  longitudeDelta: markerLocation.longitudeDelta,
+                });
+                setmapRegion({
+                  latitude,
+                  longitude,
+                  latitudeDelta: markerLocation.latitudeDelta,
+                  longitudeDelta: markerLocation.longitudeDelta,
+                });
+                const displayCoordinates = `GPS: Latitude:${latitude} Longitude:${longitude}`;
+                setDisplayCurrentAddress(displayCoordinates);
+              }}
+            >
+              <Image style={styles.marker} source={require(markerSource)} />
+            </Marker>
+          )}
+        </MapView>
+      )}
 
       {locations && !showPredictions && !showFullScreen && (
         <LocationsList
@@ -358,20 +373,5 @@ const styles = StyleSheet.create({
     width: 30,
     resizeMode: "contain",
   },
-  predictionsContainer: {
-    backgroundColor: "#cfcfcf",
-    padding: 10,
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-    position: "absolute",
-    bottom: 0,
-    height: "70%",
-    width: "100%",
-  },
-  predictionRow: {
-    paddingBottom: 15,
-    marginBottom: 15,
-    borderBottomColor: "black",
-    borderBottomWidth: 1,
-  },
+  activityHeight: { height: 30, marginTop: "30%" },
 });

@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 10,
     position: "absolute",
     bottom: 0,
-    height: "70%",
+    height: "80%",
     width: "100%",
   },
   predictionRow: {
@@ -67,12 +67,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: "5%",
   },
   circle: {
-    height: 30,
-    width: 30,
-    borderRadius: 15,
-    backgroundColor: "green",
-    alignItems: "center",
-    justifyContent: "center",
     marginRight: 5,
   },
 });

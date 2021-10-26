@@ -17,8 +17,8 @@ const reducer = (
         id: Math.random().toString(), // not really unique but it's just an example
         title: action.location.title,
         body: action.location.body,
-        latitude: 0,
-        longitude: 0,
+        latitude: action.location.latitude,
+        longitude: action.location.longitude,
       };
       return {
         ...state,

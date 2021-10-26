@@ -79,7 +79,7 @@ Path.prototype.randomPos = function () {
  * var ordered_points = solution.map(i => points[i]);
  * // ordered_points now contains the points, in the order they ought to be visited.
  **/
-export function solve(points, temp_coeff, callback) {
+function solve(points, temp_coeff, callback) {
   var path = new Path(points);
   if (points.length < 2) return path.order; // There is nothing to optimize
   if (!temp_coeff)

@@ -20,8 +20,12 @@ export const ConfirmButtonGroup: FunctionComponent<ConfirmButtonGroupProps> = ({
 }) => {
   return (
     <View style={styles.container}>
-      <Button onPress={onCancelPress} title={"Cancel"} />
-      <Button onPress={onConfirmPress} title={"Confirm"} />
+      <TouchableOpacity style={styles.button} onPress={onCancelPress}>
+        <Text style={styles.buttonText}>Cancel</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={onConfirmPress}>
+        <Text style={styles.buttonText}>Confirm</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -35,12 +39,18 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
   },
-  predictionRow: {
-    paddingBottom: 15,
-    borderBottomColor: "black",
-    borderBottomWidth: 1,
-    backgroundColor: "white",
-    height: 50,
+  button: {
+    borderRadius: 20,
+    backgroundColor: "lightgrey",
+    alignItems: "center",
+    justifyContent: "center",
+    height: 45,
+    marginHorizontal: 20,
+  },
+  buttonText: {
+    fontSize: 20,
+    paddingHorizontal: 20,
   },
 });

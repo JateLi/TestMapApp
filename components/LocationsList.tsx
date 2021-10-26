@@ -17,9 +17,6 @@ type SearchBarProps = {
   onClickDestinations: () => void;
 };
 
-const itemHeight = 50;
-const maxListHeight = 300;
-
 export const LocationsList: React.FC<SearchBarProps> = ({
   locations,
   showLocations = true,
@@ -63,14 +60,18 @@ export const LocationsList: React.FC<SearchBarProps> = ({
       ListHeaderComponent={
         <>
           <View style={styles.header}>
-            <Text numberOfLines={1}>{"DIRECTIONS"}</Text>
-            <Button
-              onPress={() => {
-                // TODO Solve Saleman question
-                onClickDestinations();
-              }}
-              title={"DIRECTIONS"}
-            />
+            <View style={styles.headerHolder}>
+              <Text>{"Destinations"}</Text>
+              <TouchableOpacity
+                // style={{ height: 10, backgroundColor: "blue", width: 20 }}
+                onPress={() => {
+                  // TODO Solve Saleman question
+                  onClickDestinations();
+                }}
+              >
+                <Text>{"DIRECTIONS"}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </>
       }
@@ -109,6 +110,13 @@ const styles = StyleSheet.create({
     height: 60,
     borderColor: "lightgrey",
     borderBottomWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerHolder: {
+    width: "90%",
+    backgroundColor: "white",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
