@@ -4,6 +4,7 @@
 
 # Setup
 
+yarn install
 expo install
 
 ## Available Scripts
