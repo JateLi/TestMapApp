@@ -47,7 +47,7 @@ export type LocationState = {
 
 export type LocationAction = {
   type: string;
-  location: Location;
+  location?: Location;
 };
 
 export type PredictionType = {

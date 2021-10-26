@@ -34,7 +34,7 @@ export const PredictionList: FunctionComponent<SearchBarProps> = ({
                 onPredictionTapped(item.place_id, item.description)
               }
             >
-              <FontAwesome name="plus-circle" size={25} color="green" />
+              <FontAwesome name="plus-circle" size={30} color="green" />
             </TouchableOpacity>
             <Text numberOfLines={1}>{item.description}</Text>
           </View>
@@ -58,13 +58,13 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   predictionRow: {
-    borderBottomColor: "black",
+    borderBottomColor: "lightgrey",
     borderBottomWidth: 1,
     backgroundColor: "white",
-    height: 50,
+    height: 60,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: "5%",
+    paddingHorizontal: "2%",
   },
   circle: {
     marginRight: 5,

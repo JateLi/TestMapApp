@@ -5,7 +5,6 @@ import {
   FlatList,
   TouchableOpacity,
   View,
-  Button,
 } from "react-native";
 import { Location } from "../types";
 import Swipeout from "react-native-swipeout";
@@ -15,6 +14,7 @@ type SearchBarProps = {
   showLocations: boolean;
   removingLocationFromList: (location: Location) => void;
   onClickDestinations: () => void;
+  onClickRemoveAll: () => void;
 };
 
 export const LocationsList: React.FC<SearchBarProps> = ({
@@ -22,6 +22,7 @@ export const LocationsList: React.FC<SearchBarProps> = ({
   showLocations = true,
   removingLocationFromList,
   onClickDestinations,
+  onClickRemoveAll,
 }) => {
   const { predictionsContainer, predictionRow } = styles;
   const [deleteItem, setDeleteItem] = useState(null);
@@ -63,13 +64,21 @@ export const LocationsList: React.FC<SearchBarProps> = ({
             <View style={styles.headerHolder}>
               <Text>{"Destinations"}</Text>
               <TouchableOpacity
-                // style={{ height: 10, backgroundColor: "blue", width: 20 }}
-                onPress={() => {
-                  // TODO Solve Saleman question
-                  onClickDestinations();
-                }}
+                style={{ backgroundColor: "lightgrey", borderRadius: 5 }}
+                onPress={() => onClickRemoveAll()}
               >
-                <Text>{"DIRECTIONS"}</Text>
+                <Text style={{ paddingHorizontal: 10, paddingVertical: 5 }}>
+                  {"Clear all"}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={{ backgroundColor: "lightgrey", borderRadius: 5 }}
+                onPress={() => onClickDestinations()}
+              >
+                <Text style={{ paddingHorizontal: 10, paddingVertical: 5 }}>
+                  {"DIRECTIONS"}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -79,7 +88,10 @@ export const LocationsList: React.FC<SearchBarProps> = ({
         return (
           <Swipeout left={swipeoutBtns} onOpen={() => setDeleteItem(item)}>
             <View style={predictionRow}>
-              <Text numberOfLines={1}>{`(${index}) ${item.title}`}</Text>
+              <Text
+                numberOfLines={1}
+                style={styles.rowText}
+              >{`(${index}) ${item.title}`}</Text>
             </View>
           </Swipeout>
         );
@@ -98,11 +110,16 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   predictionRow: {
-    paddingBottom: 15,
-    borderBottomColor: "black",
+    paddingVertical: 10,
+    borderBottomColor: "lightgrey",
     borderBottomWidth: 1,
     backgroundColor: "white",
     height: 50,
+    justifyContent: "center",
+  },
+  rowText: {
+    fontSize: 18,
+    marginHorizontal: "5%",
   },
   header: {
     width: "100%",

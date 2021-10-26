@@ -25,7 +25,7 @@ export default function ModalScreen() {
   });
   console.log(sortingList);
   const { predictionsContainer, predictionRow } = styles;
-  //Mock
+  //TODO remove Mock
   const tests = [
     [1, 10],
     [50, 11],
@@ -37,14 +37,10 @@ export default function ModalScreen() {
   const pathSolution = salesman.solve(sortingList);
   const newOrderedLocations = pathSolution.map((i) => locations[i]);
 
-  // console.log(pathSolution);
-  // console.log(newOrderedLocations);
   useEffect(() => {
-    var points = tests.map(([x, y]) => new salesman.Point(x, y));
-    var solution = salesman.solve(points);
-    var ordered_points = solution.map((i) => points[i]);
-    // console.log(solution);
-    // console.log(ordered_points);
+    // var points = tests.map(([x, y]) => new salesman.Point(x, y));
+    // var solution = salesman.solve(points);
+    // var ordered_points = solution.map((i) => points[i]);
   }, []);
 
   const renderEmptyContainer = () => {
@@ -69,7 +65,10 @@ export default function ModalScreen() {
       renderItem={({ item, index }) => {
         return (
           <View style={predictionRow}>
-            <Text numberOfLines={1}>{`${item.title}`}</Text>
+            <Text
+              numberOfLines={1}
+              style={styles.rowText}
+            >{` ${item.title}`}</Text>
           </View>
         );
       }}
@@ -87,11 +86,16 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   predictionRow: {
-    paddingBottom: 15,
-    borderBottomColor: "black",
+    paddingVertical: 10,
+    borderBottomColor: "lightgrey",
     borderBottomWidth: 1,
     backgroundColor: "white",
     height: 50,
+    justifyContent: "center",
+  },
+  rowText: {
+    fontSize: 18,
+    marginHorizontal: "5%",
   },
   header: {
     width: "100%",
@@ -100,7 +104,7 @@ const styles = StyleSheet.create({
     borderColor: "lightgrey",
     borderBottomWidth: 1,
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
+    justifyContent: "center",
   },
 });

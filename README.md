@@ -2,6 +2,8 @@
 
 # Getting Started with TestMapApp
 
+# Setup
+
 expo install
 
 ## Available Scripts

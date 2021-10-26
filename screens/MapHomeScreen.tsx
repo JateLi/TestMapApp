@@ -4,9 +4,7 @@ import {
   TouchableOpacity,
   Image,
   Alert,
-  Button,
   View,
-  StatusBar,
   Platform,
   ActivityIndicator,
 } from "react-native";
@@ -31,7 +29,11 @@ import { PredictionList } from "../components/PredictionList";
 import { GOOGLE_API_KEY as apiKey } from "@env";
 import { LocationsList } from "../components/LocationsList";
 import { Dispatch } from "redux";
-import { addLocation, removeLocation } from "../store/actionCreator";
+import {
+  addLocation,
+  removeAllLocation,
+  removeLocation,
+} from "../store/actionCreator";
 import { ConfirmButtonGroup } from "../components/ConfirmButtonGroup";
 import {
   askNotification,
@@ -88,6 +90,11 @@ export default function MapHomeScreen({
 
   const removingLocationFromList = React.useCallback(
     (location: geoLocation) => dispatch(removeLocation(location)),
+    [dispatch]
+  );
+
+  const removingAllLocationFromList = React.useCallback(
+    () => dispatch(removeAllLocation()),
     [dispatch]
   );
 
@@ -234,13 +241,29 @@ export default function MapHomeScreen({
     }
   };
 
+  const returnNewName = () => {
+    const locationTitle = locations.map(({ title }) => title);
+    let index = 0;
+    let newName = "Current Location";
+
+    while (locationTitle.includes(newName)) {
+      index = index + 1;
+      newName = `Current Location ${index}`;
+    }
+    return newName;
+  };
+
   const onConfirmLocationMarker = (type: "confirm" | "cancel") => {
     // Save location and clean the marker
+    locations.find;
+
     if (type === "confirm") {
+      const newName = returnNewName();
+
       const newLocationItem = {
         id: "-1",
-        title: "Current Location",
-        body: "Current Location",
+        title: newName,
+        body: newName,
         latitude: markerLocation.latitude,
         longitude: markerLocation.longitude,
       };
@@ -307,7 +330,9 @@ export default function MapHomeScreen({
                   latitudeDelta: markerLocation.latitudeDelta,
                   longitudeDelta: markerLocation.longitudeDelta,
                 });
-                const displayCoordinates = `GPS: Latitude:${latitude} Longitude:${longitude}`;
+                const displayCoordinates = `GPS: Latitude:${latitude.toFixed(
+                  4
+                )} Longitude:${longitude.toFixed(4)}`;
                 setDisplayCurrentAddress(displayCoordinates);
               }}
             >
@@ -322,6 +347,7 @@ export default function MapHomeScreen({
           locations={locations}
           removingLocationFromList={removingLocationFromList}
           onClickDestinations={onClickDestinations}
+          onClickRemoveAll={removingAllLocationFromList}
         />
       )}
 

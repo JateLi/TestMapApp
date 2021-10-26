@@ -32,6 +32,11 @@ const reducer = (
         ...state,
         locations: updatedContacts,
       };
+    case actionTypes.REMOVE_ALL_LOCATION:
+      return {
+        ...state,
+        locations: [],
+      };
     case actionTypes.EDIT_LOCATION:
       const contactPayload = action.location;
       const index = state.locations.findIndex(

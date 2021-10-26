@@ -18,6 +18,15 @@ export function removeLocation(contact: Location) {
   return simulateHttpRequest(action);
 }
 
+export function removeAllLocation() {
+  const action: LocationAction = {
+    type: actionTypes.REMOVE_ALL_LOCATION,
+  };
+  return (dispatch: DispatchType) => {
+    dispatch(action);
+  };
+}
+
 export function editLocation(contact: Location) {
   const action: LocationAction = {
     type: actionTypes.EDIT_LOCATION,
